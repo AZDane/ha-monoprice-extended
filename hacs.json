@@ -1,0 +1,7 @@
+cat > hacs.json <<'EOF'
+{
+  "name": "Monoprice 6-Zone (Extended)",
+  "content_in_root": false,
+  "render_readme": true
+}
+EOF
