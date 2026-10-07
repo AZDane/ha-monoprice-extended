@@ -2,7 +2,6 @@
 
 import logging
 
-from pymonoprice import get_monoprice
 from serial import SerialException
 
 from homeassistant.config_entries import ConfigEntry
@@ -11,6 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
 from .const import CONF_NOT_FIRST_RUN, DOMAIN, FIRST_RUN, MONOPRICE_OBJECT
+from .connection import ResilientMonoprice
 
 PLATFORMS = [Platform.MEDIA_PLAYER, Platform.NUMBER]
 
@@ -22,8 +22,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     port = entry.data[CONF_PORT]
 
     try:
-        monoprice = await hass.async_add_executor_job(get_monoprice, port)
-    except SerialException as err:
+        monoprice = await hass.async_add_executor_job(ResilientMonoprice, port)
+    except (SerialException, OSError, TimeoutError) as err:
         _LOGGER.error("Error connecting to Monoprice controller at %s", port)
         raise ConfigEntryNotReady from err
 
@@ -54,12 +54,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         return False
 
     def _cleanup(monoprice) -> None:
-        """Destroy the Monoprice object.
-
-        Destroying the Monoprice closes the serial connection, do it in an executor so the garbage
-        collection does not block.
-        """
-        del monoprice
+        """Explicitly close the serial-over-TCP connection."""
+        monoprice.close()
 
     monoprice = hass.data[DOMAIN][entry.entry_id][MONOPRICE_OBJECT]
     hass.data[DOMAIN].pop(entry.entry_id)
