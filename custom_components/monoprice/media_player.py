@@ -159,7 +159,7 @@ class MonopriceZone(MediaPlayerEntity):
         """Retrieve latest state."""
         try:
             state = self._monoprice.zone_status(self._zone_id)
-        except SerialException:
+        except (SerialException, OSError, TimeoutError):
             self._update_success = False
             _LOGGER.warning("Could not update zone %d", self._zone_id)
             return
@@ -168,11 +168,17 @@ class MonopriceZone(MediaPlayerEntity):
             self._update_success = False
             return
 
+        self._update_success = True
         self._attr_state = MediaPlayerState.ON if state.power else MediaPlayerState.OFF
         self._attr_volume_level = state.volume / MAX_VOLUME
         self._attr_is_volume_muted = state.mute
         idx = state.source
         self._attr_source = self._source_id_name.get(idx)
+
+    @property
+    def available(self) -> bool:
+        """Return whether the most recent status request succeeded."""
+        return self._update_success
 
     @property
     def entity_registry_enabled_default(self) -> bool:

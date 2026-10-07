@@ -1,7 +1,7 @@
 {
   "domain": "monoprice",
   "name": "Monoprice 6-Zone Amplifier",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "codeowners": ["@AZDane"],
   "config_flow": true,
   "documentation": "https://github.com/AZDane/ha-monoprice-extended",

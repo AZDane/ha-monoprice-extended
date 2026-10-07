@@ -4,6 +4,8 @@ Extends the Home Assistant Monoprice integration with:
 - Configurable unit count (1–3) to avoid polling non-existent zones
 - Per-zone Bass and Treble controls (Number entities)
 - Improved responsiveness by avoiding polling non-existent zones
+- Automatic reconnect and one retry after serial/TCP transport failures
+- One cached all-zone status request per amplifier unit instead of polling each control separately
 
 ## Installation
 
@@ -26,3 +28,4 @@ Settings → Devices & services → Monoprice → Configure → Number of amplif
 - Drop-in replacement for the core Monoprice integration
 - Uses the existing Monoprice serial protocol
 - No hardware changes required
+- Bass and treble values restore their last state and update when changed in Home Assistant; they are not continuously polled

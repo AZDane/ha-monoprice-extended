@@ -73,6 +73,9 @@ class MonopriceToneNumber(NumberEntity, RestoreEntity):
     _attr_native_min_value = TONE_MIN
     _attr_native_max_value = TONE_MAX
     _attr_native_step = TONE_STEP
+    # Tone is rarely changed and setters update state optimistically. Avoid two
+    # extra zone-status requests per zone during every polling cycle.
+    _attr_should_poll = False
 
     def __init__(self, monoprice, namespace: str, zone_id: int, kind: str) -> None:
         self._monoprice = monoprice
